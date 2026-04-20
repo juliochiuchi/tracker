@@ -1,73 +1,84 @@
-# React + TypeScript + Vite
+# Package Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicação web para gestão de encomendas, com foco em organização, acompanhamento de status e visão rápida dos pedidos cadastrados.
 
-Currently, two official plugins are available:
+Este projeto foi desenvolvido para demonstrar boas práticas de front-end moderno, estrutura escalavel e experiencia de usuario objetiva.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+![Visual da aplicação](./src/assets/pstracker-home.png)
 
-## React Compiler
+## Objetivo do Projeto
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+O Package Tracker centraliza informacoes importantes de pedidos, permitindo:
 
-## Expanding the ESLint configuration
+- cadastro de novas encomendas;
+- marcacao de entrega diretamente no card;
+- filtros por status, busca por texto e filtro por ano;
+- visao resumida com metricas de pedidos e valores pendentes.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Principais Diferenciais Tecnicos
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Interface responsiva e componentizada com React + TypeScript.
+- Gerenciamento de estado local com atualizacao otimista para melhor UX.
+- Integracao com Supabase via HTTP para persistencia dos dados.
+- Validacao de formulario com Zod e React Hook Form.
+- Organizacao em camadas (componentes, hooks, controllers e services).
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS 4
+- TanStack Router
+- Axios
+- Supabase
+- Zod
+- React Hook Form
+
+## Como Executar
+
+### 1. Clone o repositorio
+
+```bash
+git clone <url-do-repositorio>
+cd tracker
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Instale as dependencias
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+### 3. Configure as variaveis de ambiente
+
+Crie um arquivo `.env` na raiz do projeto com:
+
+```env
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+```
+
+### 4. Rode o projeto em desenvolvimento
+
+```bash
+npm run dev
+```
+
+### 5. Build de producao
+
+```bash
+npm run build
+npm run preview
+```
+
+## Qualidade de Codigo
+
+- ESLint configurado para padronizacao e manutencao de qualidade.
+- Arquitetura orientada a reaproveitamento de componentes.
+- Separacao de responsabilidades para facilitar evolucao e manutencao.
+
+## Autor
+
+Julio Araujo  
+Desenvolvedor Front-end
