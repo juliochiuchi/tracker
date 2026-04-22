@@ -13,21 +13,24 @@ export const StatsBar = ({
   pending,
   delivered,
   pendingValue,
+  totalSpent,
 }: {
   total: number
   pending: number
   delivered: number
   pendingValue: number
+  totalSpent: number
 }) => {
   const cards = [
     { label: "Total", value: String(total), Icon: Package },
     { label: "Aguardando", value: String(pending), Icon: Clock },
     { label: "Entregues", value: String(delivered), Icon: PackageCheck },
     { label: "Valor pendente", value: formatCurrency(pendingValue), Icon: CircleDollarSign },
+    { label: "Total gasto", value: formatCurrency(totalSpent), Icon: CircleDollarSign },
   ] as const
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
       {cards.map(({ label, value, Icon }) => (
         <Card key={label} size="sm">
           <CardContent className="flex items-center justify-between gap-3">

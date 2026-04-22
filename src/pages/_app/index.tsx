@@ -52,7 +52,8 @@ function Index() {
     const pendingValue = items
       .filter((i) => !i.delivered)
       .reduce((acc, i) => acc + i.value, 0)
-    return { total, pending, delivered, pendingValue }
+    const totalSpent = items.reduce((acc, i) => acc + i.value, 0)
+    return { total, pending, delivered, pendingValue, totalSpent }
   }, [items])
 
   const hasActiveFilters = filter !== "all" || search !== "" || yearFilter !== ""
@@ -95,7 +96,7 @@ function Index() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-5 py-4">
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -117,6 +118,7 @@ function Index() {
         pending={stats.pending}
         delivered={stats.delivered}
         pendingValue={stats.pendingValue}
+        totalSpent={stats.totalSpent}
       />
 
       <FilterBar
@@ -137,13 +139,11 @@ function Index() {
           <div className="text-sm text-muted-foreground">{emptyText}</div>
         </div>
       ) : (
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid items-stretch gap-3 md:grid-cols-2 lg:grid-cols-3">
           {paged.map((item) => (
-            <ItemCard
-              key={item.id}
-              item={item}
-              onToggleDelivered={toggleDelivered}
-            />
+            <div key={item.id} className="h-full">
+              <ItemCard item={item} onToggleDelivered={toggleDelivered} />
+            </div>
           ))}
         </div>
       )}

@@ -7,6 +7,7 @@ import {
   ShoppingBag,
 } from "lucide-react"
 
+import { TruncatedText } from "@/components/TruncatedText"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
@@ -52,23 +53,29 @@ export const ItemCard = ({
 
   const tracking = item.tracking?.trim()
 
+  console.log('tracking', tracking)
+
   return (
-    <Card className={cn(borderClass)}>
+    <Card className={cn(borderClass, "h-full")}>
       <CardHeader className="gap-2">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <CardTitle className="truncate">{item.name}</CardTitle>
+        <div className="flex w-full items-start justify-between gap-3">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <CardTitle className="min-w-0">
+              <TruncatedText text={item.name} maxChars={19} />
+            </CardTitle>
             <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
               <Package size={16} aria-hidden />
               <span className="truncate">Adicionado {createdText}</span>
             </div>
           </div>
 
-          <Badge className={badge.className}>{badge.text}</Badge>
+          <Badge className={cn("shrink-0 whitespace-nowrap", badge.className)}>
+            {badge.text}
+          </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="grid gap-3">
+      <CardContent className="flex flex-1 flex-col gap-3">
         <div className="grid gap-2">
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2 text-sm">
@@ -104,7 +111,7 @@ export const ItemCard = ({
           ) : null}
         </div>
 
-        <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2">
+        <div className="mt-auto flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2">
           <div className="flex items-center gap-2 text-sm">
             {item.delivered ? (
               <PackageCheck size={20} aria-hidden className="text-green-600" />
