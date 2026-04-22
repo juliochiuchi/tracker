@@ -3,12 +3,15 @@ import {
   Clock,
   Package,
   PackageCheck,
+  Pencil,
   ScanBarcode,
   ShoppingBag,
+  Trash2,
 } from "lucide-react"
 
 import { TruncatedText } from "@/components/TruncatedText"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { cn, daysUntil, formatCurrency, formatDate, fromNow } from "@/lib/utils"
@@ -38,9 +41,13 @@ const getDeadlineBadge = (
 export const ItemCard = ({
   item,
   onToggleDelivered,
+  onEdit,
+  onDelete,
 }: {
   item: Item
   onToggleDelivered: (id: string) => void
+  onEdit: (id: string) => void
+  onDelete: (id: string) => void
 }) => {
   const borderClass = item.delivered
     ? "border-l-4 border-l-green-500"
@@ -53,25 +60,24 @@ export const ItemCard = ({
 
   const tracking = item.tracking?.trim()
 
-  console.log('tracking', tracking)
-
   return (
     <Card className={cn(borderClass, "h-full")}>
       <CardHeader className="gap-2">
-        <div className="flex w-full items-start justify-between gap-3">
-          <div className="min-w-0 flex-1 overflow-hidden">
+        <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1">
+          <div className="min-w-0 overflow-hidden">
             <CardTitle className="min-w-0">
               <TruncatedText text={item.name} maxChars={19} />
             </CardTitle>
-            <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-              <Package size={16} aria-hidden />
-              <span className="truncate">Adicionado {createdText}</span>
-            </div>
           </div>
 
-          <Badge className={cn("shrink-0 whitespace-nowrap", badge.className)}>
+          <Badge className={cn("shrink-0 justify-self-end whitespace-nowrap", badge.className)}>
             {badge.text}
           </Badge>
+
+          <div className="col-span-2 flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+            <Package size={16} aria-hidden />
+            <span className="whitespace-nowrap">Adicionado {createdText}</span>
+          </div>
         </div>
       </CardHeader>
 
@@ -111,19 +117,49 @@ export const ItemCard = ({
           ) : null}
         </div>
 
-        <div className="mt-auto flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2">
-          <div className="flex items-center gap-2 text-sm">
-            {item.delivered ? (
-              <PackageCheck size={20} aria-hidden className="text-green-600" />
-            ) : (
-              <Package size={20} aria-hidden className="text-muted-foreground" />
-            )}
-            <span className="font-medium">Entregue</span>
+        <div className="mt-auto grid gap-2">
+          <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2">
+              <div className="flex min-w-0 items-center gap-2 text-sm">
+                {item.delivered ? (
+                  <PackageCheck size={20} aria-hidden className="text-green-600" />
+                ) : (
+                  <Package size={20} aria-hidden className="text-muted-foreground" />
+                )}
+                <span className="truncate font-medium">Entregue</span>
+              </div>
+              <Switch
+                checked={item.delivered}
+                onCheckedChange={() => onToggleDelivered(item.id)}
+              />
+            </div>
+
+            <div className="shrink-0 rounded-full border bg-muted/20 p-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="cursor-pointer"
+                onClick={() => onEdit(item.id)}
+                aria-label="Editar"
+              >
+                <Pencil size={16} aria-hidden />
+              </Button>
+            </div>
+
+            <div className="shrink-0 rounded-full border bg-muted/20 p-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="cursor-pointer text-destructive hover:text-destructive"
+                onClick={() => onDelete(item.id)}
+                aria-label="Excluir"
+              >
+                <Trash2 size={16} aria-hidden />
+              </Button>
+            </div>
           </div>
-          <Switch
-            checked={item.delivered}
-            onCheckedChange={() => onToggleDelivered(item.id)}
-          />
         </div>
       </CardContent>
     </Card>

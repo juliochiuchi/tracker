@@ -6,6 +6,7 @@ import { STORAGE_KEYS } from "@/lib/constants"
 import type { ItemFormData } from "@/lib/schema"
 import { storage } from "@/lib/storage"
 import { getDeadlineYear } from "@/lib/utils"
+import { toast } from "@/hooks/use-toast"
 import type { ItemsPurchasedRow } from "@/types/db/itemsPurchased"
 import type { PlatformRow } from "@/types/db/platform"
 import type { Item } from "@/types/item"
@@ -43,7 +44,9 @@ export const useItems = (): {
   platforms: PlatformRow[]
   deadlineYears: string[]
   add: (data: ItemFormData) => void
+  update: (id: string, data: ItemFormData) => void
   toggleDelivered: (id: string) => void
+  remove: (id: string) => void
 } => {
   const [items, setItems] = useState<Item[]>(() => {
     return storage.getJSON<Item[]>(STORAGE_KEYS.items) ?? []
@@ -128,8 +131,91 @@ export const useItems = (): {
             prev.includes(createdYear) ? prev : [...prev, createdYear].sort().reverse()
           )
         }
+
+        toast({
+          title: "Encomenda criada",
+          description: created.name,
+        })
       } catch {
         setItems((prev) => prev.filter((it) => it.id !== optimistic.id))
+        toast({
+          title: "Erro ao criar encomenda",
+          description: "Tente novamente.",
+          variant: "destructive",
+        })
+      }
+    })()
+  }
+
+  const update = (id: string, data: ItemFormData) => {
+    const current = items.find((i) => i.id === id)
+    if (!current) return
+
+    const platformName = platformsById.get(data.platform) ?? data.platform
+    const tracking = data.tracking?.trim() ?? ""
+    const deadline = data.deadline?.trim() ?? ""
+    const delivered = data.delivered ?? false
+
+    const optimistic: Item = {
+      ...current,
+      name: data.name,
+      value: data.value,
+      platform: platformName,
+      tracking,
+      deadline,
+      delivered,
+    }
+
+    setItems((prev) => prev.map((it) => (it.id === id ? optimistic : it)))
+
+    void (async () => {
+      try {
+        const updated = await itemsController.update(id, {
+          name: data.name,
+          price: data.value,
+          platform: data.platform,
+          tracking_code: tracking ? tracking : null,
+          delivery_time: deadline ? deadline : null,
+          delivered,
+        })
+
+        const updatedPlatformName =
+          platformsById.get(updated.platform) ?? updated.platform
+
+        setItems((prev) =>
+          prev.map((it) =>
+            it.id === id
+              ? {
+                ...it,
+                name: updated.name,
+                value: updated.price,
+                platform: updatedPlatformName,
+                tracking: updated.tracking_code ?? "",
+                deadline: updated.delivery_time ?? "",
+                delivered: updated.delivered,
+              }
+              : it
+          )
+        )
+
+        const updatedYear = getDeadlineYear(updated.delivery_time)
+        if (updatedYear) {
+          setDeadlineYears((prev) =>
+            prev.includes(updatedYear) ? prev : [...prev, updatedYear].sort().reverse()
+          )
+        }
+
+        toast({
+          title: "Encomenda atualizada",
+          description: updated.name,
+        })
+      } catch {
+        setItems((prev) => prev.map((it) => (it.id === id ? current : it)))
+        toast({
+          title: "Erro ao atualizar encomenda",
+          description: "Tente novamente.",
+          variant: "destructive",
+        })
       }
     })()
   }
@@ -154,5 +240,26 @@ export const useItems = (): {
     })()
   }
 
-  return { items, platforms, deadlineYears, add, toggleDelivered }
+  const remove = (id: string) => {
+    const prev = items
+    setItems((cur) => cur.filter((it) => it.id !== id))
+
+    void (async () => {
+      try {
+        await itemsController.remove(id)
+        toast({
+          title: "Encomenda excluída",
+        })
+      } catch {
+        setItems(prev)
+        toast({
+          title: "Erro ao excluir encomenda",
+          description: "Tente novamente.",
+          variant: "destructive",
+        })
+      }
+    })()
+  }
+
+  return { items, platforms, deadlineYears, add, update, toggleDelivered, remove }
 }

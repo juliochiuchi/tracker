@@ -13,7 +13,7 @@ export const AppShell = ({ sidebar, children, className, contentClassName }: App
   return (
     <div
       className={cn(
-        "min-h-svh bg-background text-foreground md:grid md:grid-cols-[16rem_1fr]",
+        "min-h-svh bg-background text-foreground md:grid md:grid-cols-[15rem_1fr]",
         className,
       )}
     >
@@ -22,4 +22,3 @@ export const AppShell = ({ sidebar, children, className, contentClassName }: App
     </div>
   )
 }
-

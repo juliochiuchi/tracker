@@ -6,6 +6,7 @@ import {
   ScanBarcode,
   ShoppingBag,
 } from "lucide-react"
+import { useEffect, useMemo } from "react"
 import { Controller, useForm } from "react-hook-form"
 import type { z } from "zod"
 
@@ -39,34 +40,49 @@ type ItemFormInput = z.input<typeof itemSchema>
 export const ItemForm = ({
   open,
   onOpenChange,
+  mode,
+  initialValues,
   onSubmitItem,
   platforms,
-  onAdded,
+  onSuccess,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
+  mode: "create" | "edit"
+  initialValues?: Partial<ItemFormInput>
   onSubmitItem: (data: ItemFormData) => void
   platforms: PlatformRow[]
-  onAdded: () => void
+  onSuccess?: () => void
 }) => {
-  const form = useForm<ItemFormInput>({
-    resolver: zodResolver(itemSchema),
-    defaultValues: {
+  const defaultValues = useMemo<ItemFormInput>(
+    () => ({
       name: "",
       value: 0,
       platform: "",
       tracking: "",
       deadline: "",
       delivered: false,
-    },
+      ...initialValues,
+    }),
+    [initialValues]
+  )
+
+  const form = useForm<ItemFormInput>({
+    resolver: zodResolver(itemSchema),
+    defaultValues,
   })
 
-  const submit = (values: ItemFormInput) => {
+  useEffect(() => {
+    if (!open) return
+    form.reset(defaultValues)
+  }, [open, mode, form, defaultValues])
+
+  const submit = async (values: ItemFormInput) => {
     const parsed = itemSchema.parse(values)
-    onSubmitItem(parsed)
+    await onSubmitItem(parsed)
     form.reset()
     onOpenChange(false)
-    onAdded()
+    onSuccess?.()
   }
 
   const {
@@ -76,13 +92,17 @@ export const ItemForm = ({
     formState: { errors },
   } = form
 
+  const isEdit = mode === "edit"
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Adicionar encomenda</DialogTitle>
+          <DialogTitle>{isEdit ? "Editar encomenda" : "Adicionar encomenda"}</DialogTitle>
           <DialogDescription>
-            Cadastre uma compra e acompanhe o prazo e o status de entrega.
+            {isEdit
+              ? "Atualize os dados da compra e mantenha seu histórico organizado."
+              : "Cadastre uma compra e acompanhe o prazo e o status de entrega."}
           </DialogDescription>
         </DialogHeader>
 
@@ -225,7 +245,7 @@ export const ItemForm = ({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit">Adicionar</Button>
+            <Button type="submit">{isEdit ? "Salvar" : "Adicionar"}</Button>
           </div>
         </form>
       </DialogContent>

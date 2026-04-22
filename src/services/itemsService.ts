@@ -48,4 +48,36 @@ export const itemsService = {
     }
     return updated
   },
+
+  async update(
+    id: string,
+    patch: Partial<{
+      name: string
+      price: number
+      platform: string
+      tracking_code: string | null
+      delivery_time: string | null
+      delivered: boolean
+    }>
+  ): Promise<ItemsPurchasedRow> {
+    const res = await supabaseHttp.patch<ItemsPurchasedRow[]>(
+      `/${TABLE}`,
+      patch,
+      {
+        params: { id: `eq.${id}` },
+        headers: { Prefer: "return=representation" },
+      }
+    )
+    const [updated] = res.data
+    if (!updated) {
+      throw new Error("Update failed: empty response")
+    }
+    return updated
+  },
+
+  async remove(id: string): Promise<void> {
+    await supabaseHttp.delete(`/${TABLE}`, {
+      params: { id: `eq.${id}` },
+    })
+  },
 }
