@@ -7,7 +7,9 @@ import {
   ScanBarcode,
   ShoppingBag,
   Trash2,
+  Truck,
 } from "lucide-react"
+import { useEffect, useState } from "react"
 
 import { TruncatedText } from "@/components/TruncatedText"
 import { Badge } from "@/components/ui/badge"
@@ -16,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { cn, daysUntil, formatCurrency, formatDate, fromNow } from "@/lib/utils"
 import type { Item } from "@/types/item"
+import { seuRastreioController } from "@/controllers/seuRastreio"
 
 const getDeadlineBadge = (
   delivered: boolean,
@@ -59,6 +62,31 @@ export const ItemCard = ({
   const badge = getDeadlineBadge(item.delivered, item.deadline)
 
   const tracking = item.tracking?.trim()
+  const [lastRouteTrackingResult, setLastRouteTrackingResult] = useState<{
+    tracking: string
+    text: string
+  } | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    if (!tracking) return
+
+    seuRastreioController.getLastEventDescription(tracking).then((text) => {
+      if (cancelled) return
+      setLastRouteTrackingResult({ tracking, text })
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [tracking])
+
+  const lastRouteTrackingText = !tracking
+    ? "Sem informações de rastreio"
+    : lastRouteTrackingResult?.tracking === tracking
+      ? lastRouteTrackingResult.text
+      : "Carregando..."
 
   return (
     <Card className={cn(borderClass, "h-full")}>
@@ -74,9 +102,18 @@ export const ItemCard = ({
             {badge.text}
           </Badge>
 
-          <div className="col-span-2 flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-            <Package size={16} aria-hidden />
-            <span className="whitespace-nowrap">Adicionado {createdText}</span>
+          <div className="flex flex-col items-start justify-start gap-1">
+            <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+              <Package size={16} aria-hidden />
+              <span className="whitespace-nowrap">Adicionado {createdText}</span>
+            </div>
+
+            <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+              <Truck size={16} aria-hidden />
+              <span className="truncate">
+                {lastRouteTrackingText}
+              </span>
+            </div>
           </div>
         </div>
       </CardHeader>
