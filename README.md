@@ -4,7 +4,7 @@ Aplicação web para gestão de encomendas, com foco em organização, acompanha
 
 Este projeto foi desenvolvido para demonstrar boas práticas de front-end moderno, estrutura escalavel e experiencia de usuario objetiva.
 
-![Visual da aplicação](./src/assets/pstracker-home.png)
+![Visual da aplicação](./src/assets/ps-tracker-v1.png)
 
 ## Objetivo do Projeto
 
@@ -34,6 +34,7 @@ O Package Tracker centraliza informacoes importantes de pedidos, permitindo:
 - Supabase
 - Zod
 - React Hook Form
+- Seu Rastreio API
 
 ## Como Executar
 
@@ -57,6 +58,8 @@ Crie um arquivo `.env` na raiz do projeto com:
 ```env
 VITE_SUPABASE_URL=
 VITE_SUPABASE_PUBLISHABLE_KEY=
+VITE_SEU_RASTREIO_API_URL_PUBLIC=
+VITE_SEUS_RASTREIO_API_KEY=
 ```
 
 ### 4. Rode o projeto em desenvolvimento

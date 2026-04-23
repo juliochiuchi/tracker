@@ -1,32 +1,33 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "react"
 
-export const useIsOverflowing = <T extends HTMLElement>(dep?: unknown) => {
+export const useIsOverflowing = <T extends HTMLElement>(dependency?: unknown) => {
   const ref = useRef<T | null>(null)
   const [isOverflowing, setIsOverflowing] = useState(false)
 
-  const measure = useCallback(() => {
-    const el = ref.current
-    if (!el) return
-    const next = el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight
-    setIsOverflowing(next)
+  const measureOverflow = useCallback(() => {
+    const element = ref.current
+    if (!element) return
+    const nextIsOverflowing =
+      element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight
+    setIsOverflowing(nextIsOverflowing)
   }, [])
 
   useLayoutEffect(() => {
-    const el = ref.current
-    if (!el) return
+    const element = ref.current
+    if (!element) return
 
-    const raf = requestAnimationFrame(measure)
-    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null
-    ro?.observe(el)
-    window.addEventListener("resize", measure)
+    const animationFrameId = requestAnimationFrame(measureOverflow)
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined" ? new ResizeObserver(measureOverflow) : null
+    resizeObserver?.observe(element)
+    window.addEventListener("resize", measureOverflow)
 
     return () => {
-      cancelAnimationFrame(raf)
-      ro?.disconnect()
-      window.removeEventListener("resize", measure)
+      cancelAnimationFrame(animationFrameId)
+      resizeObserver?.disconnect()
+      window.removeEventListener("resize", measureOverflow)
     }
-  }, [measure, dep])
+  }, [measureOverflow, dependency])
 
-  return { ref, isOverflowing, measure }
+  return { ref, isOverflowing, measure: measureOverflow }
 }
-
