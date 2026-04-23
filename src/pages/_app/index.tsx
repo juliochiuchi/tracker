@@ -9,6 +9,7 @@ import { ItemForm } from "@/components/ItemForm"
 import { Pagination } from "@/components/Pagination"
 import { StatsBar } from "@/components/StatsBar"
 import { Button } from "@/components/ui/button"
+import { LoadingPanel } from "@/components/ui/loading"
 import { ITEMS_PER_PAGE, type StatusFilter } from "@/lib/constants"
 import type { ItemFormData } from "@/lib/schema"
 import { getDeadlineYear, normalizeText } from "@/lib/utils"
@@ -19,7 +20,7 @@ export const Route = createFileRoute('/_app/')({
 })
 
 function Index() {
-  const { items, platforms, deadlineYears, add, update, toggleDelivered, remove } = useItems()
+  const { items, platforms, deadlineYears, isLoading, add, update, toggleDelivered, remove } = useItems()
 
   const [filter, setFilter] = useState<StatusFilter>("all")
   const [search, setSearch] = useState("")
@@ -189,7 +190,9 @@ function Index() {
         onReset={onReset}
       />
 
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <LoadingPanel label="Carregando encomendas..." className="p-10" />
+      ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 rounded-xl border bg-muted/20 p-10 text-center">
           <Inbox size={28} aria-hidden className="text-muted-foreground" />
           <div className="text-sm text-muted-foreground">{emptyText}</div>

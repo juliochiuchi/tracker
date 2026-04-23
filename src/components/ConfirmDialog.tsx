@@ -15,6 +15,8 @@ export interface ConfirmDialogProps {
   description?: string
   confirmLabel?: string
   cancelLabel?: string
+  confirmDisabled?: boolean
+  cancelDisabled?: boolean
   onConfirm: () => void
 }
 
@@ -25,6 +27,8 @@ export const ConfirmDialog = ({
   description,
   confirmLabel = "Confirmar",
   cancelLabel = "Cancelar",
+  confirmDisabled = false,
+  cancelDisabled = false,
   onConfirm,
 }: ConfirmDialogProps) => {
   const handleConfirm = () => {
@@ -40,10 +44,14 @@ export const ConfirmDialog = ({
           {description ? <DialogDescription>{description}</DialogDescription> : null}
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            disabled={cancelDisabled}
+            onClick={() => onOpenChange(false)}
+          >
             {cancelLabel}
           </Button>
-          <Button variant="destructive" onClick={handleConfirm}>
+          <Button variant="destructive" disabled={confirmDisabled} onClick={handleConfirm}>
             {confirmLabel}
           </Button>
         </DialogFooter>

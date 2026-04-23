@@ -43,6 +43,7 @@ export const useItems = (): {
   items: Item[]
   platforms: PlatformRow[]
   deadlineYears: string[]
+  isLoading: boolean
   add: (data: ItemFormData) => void
   update: (id: string, data: ItemFormData) => void
   toggleDelivered: (id: string) => void
@@ -53,6 +54,7 @@ export const useItems = (): {
   })
   const [platforms, setPlatforms] = useState<PlatformRow[]>([])
   const [deadlineYears, setDeadlineYears] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const platformsById = useMemo(() => {
     const map = new Map<string, string>()
@@ -68,23 +70,31 @@ export const useItems = (): {
     let cancelled = false
 
     const load = async () => {
-      const platformsRes = await platformsController.list().catch(() => [])
-      const itemsRes = await itemsController.list().catch(() => [])
-      if (cancelled) return
-      setPlatforms(platformsRes)
-      setDeadlineYears(buildDeadlineYears(itemsRes))
+      setIsLoading(true)
+      try {
+        const [loadedPlatforms, loadedItems] = await Promise.all([
+          platformsController.list().catch(() => []),
+          itemsController.list().catch(() => []),
+        ])
 
-      const mapped: Item[] = itemsRes.map((r) => ({
-        id: r.id,
-        name: r.name,
-        value: r.price,
-        platform: toPlatformName(r.platform, platformsRes),
-        tracking: r.tracking_code ?? "",
-        deadline: r.delivery_time ?? "",
-        delivered: r.delivered,
-        createdAt: r.created_at,
-      }))
-      setItems(mapped)
+        if (cancelled) return
+        setPlatforms(loadedPlatforms)
+        setDeadlineYears(buildDeadlineYears(loadedItems))
+
+        const mapped: Item[] = loadedItems.map((row) => ({
+          id: row.id,
+          name: row.name,
+          value: row.price,
+          platform: toPlatformName(row.platform, loadedPlatforms),
+          tracking: row.tracking_code ?? "",
+          deadline: row.delivery_time ?? "",
+          delivered: row.delivered,
+          createdAt: row.created_at,
+        }))
+        setItems(mapped)
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
     }
 
     void load()
@@ -261,5 +271,14 @@ export const useItems = (): {
     })()
   }
 
-  return { items, platforms, deadlineYears, add, update, toggleDelivered, remove }
+  return {
+    items,
+    platforms,
+    deadlineYears,
+    isLoading,
+    add,
+    update,
+    toggleDelivered,
+    remove,
+  }
 }

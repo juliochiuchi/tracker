@@ -5,14 +5,14 @@ const TABLE = "items_purchased"
 
 export const itemsService = {
   async list(): Promise<ItemsPurchasedRow[]> {
-    const res = await supabaseHttp.get<ItemsPurchasedRow[]>(`/${TABLE}`, {
+    const response = await supabaseHttp.get<ItemsPurchasedRow[]>(`/${TABLE}`, {
       params: {
         select:
           "id,name,price,platform,tracking_code,delivery_time,delivered,created_at",
         order: "created_at.desc",
       },
     })
-    return res.data
+    return response.data
   },
 
   async create(input: {
@@ -23,10 +23,10 @@ export const itemsService = {
     delivery_time: string | null
     delivered: boolean
   }): Promise<ItemsPurchasedRow> {
-    const res = await supabaseHttp.post<ItemsPurchasedRow[]>(`/${TABLE}`, input, {
+    const response = await supabaseHttp.post<ItemsPurchasedRow[]>(`/${TABLE}`, input, {
       headers: { Prefer: "return=representation" },
     })
-    const [created] = res.data
+    const [created] = response.data
     if (!created) {
       throw new Error("Create failed: empty response")
     }
@@ -34,7 +34,7 @@ export const itemsService = {
   },
 
   async setDelivered(id: string, delivered: boolean): Promise<ItemsPurchasedRow> {
-    const res = await supabaseHttp.patch<ItemsPurchasedRow[]>(
+    const response = await supabaseHttp.patch<ItemsPurchasedRow[]>(
       `/${TABLE}`,
       { delivered },
       {
@@ -42,7 +42,7 @@ export const itemsService = {
         headers: { Prefer: "return=representation" },
       }
     )
-    const [updated] = res.data
+    const [updated] = response.data
     if (!updated) {
       throw new Error("Update failed: empty response")
     }
@@ -60,7 +60,7 @@ export const itemsService = {
       delivered: boolean
     }>
   ): Promise<ItemsPurchasedRow> {
-    const res = await supabaseHttp.patch<ItemsPurchasedRow[]>(
+    const response = await supabaseHttp.patch<ItemsPurchasedRow[]>(
       `/${TABLE}`,
       patch,
       {
@@ -68,7 +68,7 @@ export const itemsService = {
         headers: { Prefer: "return=representation" },
       }
     )
-    const [updated] = res.data
+    const [updated] = response.data
     if (!updated) {
       throw new Error("Update failed: empty response")
     }
@@ -79,5 +79,20 @@ export const itemsService = {
     await supabaseHttp.delete(`/${TABLE}`, {
       params: { id: `eq.${id}` },
     })
+  },
+
+  async existsWithPlatformId(platformId: string): Promise<boolean> {
+    const response = await supabaseHttp.get<Pick<ItemsPurchasedRow, "id">[]>(
+      `/${TABLE}`,
+      {
+        params: {
+          select: "id",
+          platform: `eq.${platformId}`,
+          limit: 1,
+        },
+      }
+    )
+
+    return response.data.length > 0
   },
 }

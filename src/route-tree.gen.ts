@@ -13,6 +13,7 @@ import { Route as AuthLayoutRouteImport } from './pages/_auth/layout'
 import { Route as AppLayoutRouteImport } from './pages/_app/layout'
 import { Route as AppIndexRouteImport } from './pages/_app/index'
 import { Route as AuthLoginRouteImport } from './pages/_auth/login'
+import { Route as AppPlatformsRouteImport } from './pages/_app/platforms'
 
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
   id: '/_auth',
@@ -32,28 +33,42 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
+const AppPlatformsRoute = AppPlatformsRouteImport.update({
+  id: '/platforms',
+  path: '/platforms',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/platforms': typeof AppPlatformsRoute
   '/login': typeof AuthLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
+  '/platforms': typeof AppPlatformsRoute
   '/login': typeof AuthLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppLayoutRouteWithChildren
   '/_auth': typeof AuthLayoutRouteWithChildren
+  '/_app/platforms': typeof AppPlatformsRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths: '/' | '/platforms' | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/_app' | '/_auth' | '/_auth/login' | '/_app/'
+  to: '/' | '/platforms' | '/login'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_auth'
+    | '/_app/platforms'
+    | '/_auth/login'
+    | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -91,14 +106,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
+    '/_app/platforms': {
+      id: '/_app/platforms'
+      path: '/platforms'
+      fullPath: '/platforms'
+      preLoaderRoute: typeof AppPlatformsRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
   }
 }
 
 interface AppLayoutRouteChildren {
+  AppPlatformsRoute: typeof AppPlatformsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
+  AppPlatformsRoute: AppPlatformsRoute,
   AppIndexRoute: AppIndexRoute,
 }
 

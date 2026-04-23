@@ -1,5 +1,5 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { Package } from "lucide-react"
+import { Package, Store } from "lucide-react"
 
 import { AppShell } from "@/components/AppShell"
 import { AppSidebar } from "@/components/AppSidebar"
@@ -15,7 +15,10 @@ function AppLayout() {
       sidebar={
         <AppSidebar
           title="Package Tracker"
-          items={[{ label: "Encomendas", to: "/", icon: Package }]}
+          items={[
+            { label: "Encomendas", to: "/", icon: Package },
+            { label: "Plataformas", to: "/platforms", icon: Store },
+          ]}
           footer={<ThemeToggle />}
         />
       }
