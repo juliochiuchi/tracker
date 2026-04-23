@@ -239,6 +239,11 @@ export const useItems = (): {
       prev.map((i) => (i.id === id ? { ...i, delivered: nextDelivered } : i))
     )
 
+    toast({
+      title: nextDelivered ? "Marcado como entregue" : "Marcado como pendente",
+      description: current.name,
+    })
+
     void (async () => {
       try {
         await itemsController.setDelivered(id, nextDelivered)
@@ -246,6 +251,12 @@ export const useItems = (): {
         setItems((prev) =>
           prev.map((i) => (i.id === id ? { ...i, delivered: !nextDelivered } : i))
         )
+
+        toast({
+          title: "Erro ao atualizar status",
+          description: "Tente novamente.",
+          variant: "destructive",
+        })
       }
     })()
   }
